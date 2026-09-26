@@ -1,10 +1,11 @@
+JS
 const Database = require('better-sqlite3');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-
+ 
 const db = new Database(path.join(__dirname, 'greennest.db'));
 db.pragma('journal_mode = WAL');
-
+ 
 // ---------- SCHEMA ----------
 db.exec(`
 CREATE TABLE IF NOT EXISTS admins (
@@ -12,12 +13,12 @@ CREATE TABLE IF NOT EXISTS admins (
   username TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL
 );
-
+ 
 CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT UNIQUE NOT NULL
 );
-
+ 
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE IF NOT EXISTS products (
   is_active INTEGER DEFAULT 1,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
+ 
 CREATE TABLE IF NOT EXISTS locations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   city TEXT NOT NULL,
@@ -40,7 +41,7 @@ CREATE TABLE IF NOT EXISTS locations (
   notes TEXT,
   is_active INTEGER DEFAULT 1
 );
-
+ 
 CREATE TABLE IF NOT EXISTS delivery_partners (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
@@ -52,7 +53,7 @@ CREATE TABLE IF NOT EXISTS delivery_partners (
   status TEXT DEFAULT 'active',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
+ 
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   customer_name TEXT NOT NULL,
@@ -72,13 +73,13 @@ CREATE TABLE IF NOT EXISTS orders (
   order_status TEXT DEFAULT 'placed',
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
-
+ 
 CREATE TABLE IF NOT EXISTS site_settings (
   key TEXT PRIMARY KEY,
   value TEXT
 );
 `);
-
+ 
 // ---------- SEED (only if empty) ----------
 const adminCount = db.prepare('SELECT COUNT(*) AS c FROM admins').get().c;
 if (adminCount === 0) {
@@ -86,14 +87,14 @@ if (adminCount === 0) {
   db.prepare('INSERT INTO admins (username, password_hash) VALUES (?, ?)').run('admin', hash);
   console.log('Seeded default admin -> username: admin | password: admin123 (CHANGE THIS IMMEDIATELY)');
 }
-
+ 
 const catCount = db.prepare('SELECT COUNT(*) AS c FROM categories').get().c;
 if (catCount === 0) {
   const cats = ['Indoor Plants', 'Outdoor Plants', 'Flowering Plants', 'Fruit Plants', 'Succulents & Cacti', 'Air Purifying Plants', 'Bonsai', 'Seeds & Fertilizers'];
   const ins = db.prepare('INSERT INTO categories (name) VALUES (?)');
   cats.forEach(c => ins.run(c));
 }
-
+ 
 const productCount = db.prepare('SELECT COUNT(*) AS c FROM products').get().c;
 if (productCount === 0) {
   const sample = [
@@ -113,7 +114,7 @@ if (productCount === 0) {
   const ins = db.prepare('INSERT INTO products (name, category, description, price, stock, image) VALUES (?, ?, ?, ?, ?, ?)');
   sample.forEach(p => ins.run(p[0], p[1], p[2], p[3], p[4], '/uploads/default-plant.svg'));
 }
-
+ 
 const locCount = db.prepare('SELECT COUNT(*) AS c FROM locations').get().c;
 if (locCount === 0) {
   const locs = [
@@ -130,25 +131,26 @@ if (locCount === 0) {
   const ins = db.prepare('INSERT INTO locations (city, area, delivery_charge, plantation_charge, same_day_available, notes) VALUES (?, ?, ?, ?, ?, ?)');
   locs.forEach(l => ins.run(...l));
 }
-
+ 
 const partnerCount = db.prepare('SELECT COUNT(*) AS c FROM delivery_partners').get().c;
 if (partnerCount === 0) {
   db.prepare(`INSERT INTO delivery_partners (name, partner_type, contact_number, coverage_area, status)
               VALUES (?, ?, ?, ?, ?)`).run('In-House Delivery Team', 'in-house', '+91-9999999999', 'Lucknow, Kakori, Malihabad, Maal', 'active');
 }
-
-const settingsCount = db.prepare('SELECT COUNT(*) AS c FROM site_settings').get().c;
-if (settingsCount === 0) {
-  const defaults = {
-    site_name: 'Green Nest Plants',
-    tagline: 'Lucknow\'s Trusted Online Plant Nursery & Plantation Service',
-    phone: '+91-9999999999',
-    email: 'contact@greennestplants.in',
-    address: 'Gomti Nagar, Lucknow, Uttar Pradesh, India',
-    whatsapp: '919999999999'
-  };
-  const ins = db.prepare('INSERT INTO site_settings (key, value) VALUES (?, ?)');
-  Object.entries(defaults).forEach(([k, v]) => ins.run(k, v));
-}
-
+ 
+const settingsDefaults = {
+  site_name: 'Green Nest Plants',
+  tagline: 'Lucknow\'s Trusted Online Plant Nursery & Plantation Service',
+  phone: '+91-9999999999',
+  email: 'contact@greennestplants.in',
+  address: 'Gomti Nagar, Lucknow, Uttar Pradesh, India',
+  whatsapp: '919999999999',
+  instagram_url: ''
+};
+// Insert only keys that don't already exist yet, so upgrading an existing
+// database (already seeded before this change) still picks up new keys
+// like instagram_url/facebook_url without touching values already saved.
+const insertSettingIfMissing = db.prepare('INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)');
+Object.entries(settingsDefaults).forEach(([k, v]) => insertSettingIfMissing.run(k, v));
+ 
 module.exports = db;
