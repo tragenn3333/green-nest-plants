@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="section">
+  <div class="container" style="max-width:600px; text-align:center;">
+    <div style="font-size:4rem;">✅</div>
+    <h1>Order Placed Successfully!</h1>
+    <p>Thank you, <%= order.customer_name %>. Your order <strong>#<%= order.id %></strong> has been received.</p>
+    <div class="admin-panel-box" style="text-align:left;">
+      <p><strong>Items Total:</strong> ₹<%= order.items_total %></p>
+      <p><strong>Delivery Charge:</strong> ₹<%= order.delivery_charge %></p>
+      <p><strong>Plantation Charge:</strong> ₹<%= order.plantation_charge %></p>
+      <p><strong>Grand Total:</strong> ₹<%= order.grand_total %></p>
+      <p><strong>Payment Status:</strong> <%= order.payment_status %></p>
+    </div>
+    <p>We'll contact you at your registered phone number to confirm delivery details.</p>
+    <a href="/plants" class="btn btn-primary">Continue Shopping</a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+</body>
+</html>

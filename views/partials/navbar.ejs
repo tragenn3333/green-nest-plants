@@ -1,0 +1,21 @@
+<header class="site-header">
+  <div class="container nav-wrap">
+    <a href="/" class="brand">
+      <span class="brand-icon">🌿</span>
+      <span class="brand-text"><%= settings.site_name || 'Green Nest Plants' %></span>
+    </a>
+    <nav class="main-nav" id="mainNav">
+      <a href="/" class="<%= currentPath === '/' ? 'active' : '' %>">Home</a>
+      <a href="/plants" class="<%= currentPath.startsWith('/plants') ? 'active' : '' %>">Shop Plants</a>
+      <a href="/services" class="<%= currentPath === '/services' ? 'active' : '' %>">Plantation &amp; Delivery</a>
+      <a href="/#areas">Areas We Serve</a>
+      <a href="/#contact">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="/cart" class="cart-link" aria-label="Cart">
+        🛒 <span id="cartCount">0</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+    </div>
+  </div>
+</header>

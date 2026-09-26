@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="section">
+  <div class="container">
+    <h1>Your Cart</h1>
+    <div id="cartContainer"></div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<script>
+function renderCartPage() {
+  const cart = getCart();
+  const container = document.getElementById('cartContainer');
+  if (cart.length === 0) {
+    container.innerHTML = '<p>Your cart is empty. <a href="/plants">Browse plants →</a></p>';
+    return;
+  }
+  let rows = cart.map(item => `
+    <tr>
+      <td><img src="${item.image}" class="cart-item-img" alt="${item.name}"></td>
+      <td>${item.name}</td>
+      <td>₹${item.price}</td>
+      <td><input type="number" min="1" value="${item.qty}" style="width:60px;padding:6px;" onchange="updateQty(${item.productId}, this.value)"></td>
+      <td>₹${(item.price * item.qty).toFixed(2)}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${item.productId})">Remove</button></td>
+    </tr>
+  `).join('');
+
+  const total = cartTotal();
+
+  container.innerHTML = `
+    <table class="cart-table">
+      <thead><tr><th>Image</th><th>Plant</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="cart-summary">
+      <div class="cart-summary-row"><span>Items Total</span><span>₹${total.toFixed(2)}</span></div>
+      <p style="font-size:0.85rem;color:var(--text-muted);">Delivery &amp; plantation charges calculated at checkout based on your location.</p>
+      <a href="/checkout" class="btn btn-primary btn-block" style="margin-top:14px;">Proceed to Checkout</a>
+    </div>
+  `;
+}
+document.addEventListener('DOMContentLoaded', renderCartPage);
+</script>
+</body>
+</html>

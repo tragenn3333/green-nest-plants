@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %> | Green Nest Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <%- include('../partials/admin-sidebar') %>
+  <main class="admin-main">
+    <div class="admin-topbar"><h1>Delivery &amp; Plantation Charges by Area</h1></div>
+    <p style="color:var(--text-muted); margin-top:-16px;">These charges automatically appear on the website's Services page and at checkout.</p>
+
+    <div class="admin-panel-box">
+      <h3>Add New Area</h3>
+      <form method="POST" action="/admin/locations">
+        <div class="form-row">
+          <div class="form-group"><label>City</label><input type="text" name="city" required placeholder="e.g. Lucknow"></div>
+          <div class="form-group"><label>Area / Locality</label><input type="text" name="area" required placeholder="e.g. Kakori"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Delivery Charge (₹)</label><input type="number" step="0.01" name="delivery_charge" required></div>
+          <div class="form-group"><label>Plantation Service Charge (₹)</label><input type="number" step="0.01" name="plantation_charge" required></div>
+        </div>
+        <div class="form-group checkbox-row"><input type="checkbox" name="same_day_available"> <label style="margin:0;">Same-day delivery available</label></div>
+        <div class="form-group"><label>Notes (optional)</label><input type="text" name="notes" placeholder="e.g. 24-48 hr delivery"></div>
+        <button type="submit" class="btn btn-primary">Add Area</button>
+      </form>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>City</th><th>Area</th><th>Delivery ₹</th><th>Plantation ₹</th><th>Same-Day</th><th>Active</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% locations.forEach(loc => { %>
+          <tr>
+            <td><%= loc.city %></td>
+            <td><%= loc.area %></td>
+            <td>₹<%= loc.delivery_charge %></td>
+            <td>₹<%= loc.plantation_charge %></td>
+            <td><%= loc.same_day_available ? '✅' : '❌' %></td>
+            <td><%= loc.is_active ? '✅' : '❌' %></td>
+            <td><button class="btn btn-sm btn-outline" onclick="document.getElementById('editloc-<%= loc.id %>').style.display='block'">Edit</button></td>
+          </tr>
+          <tr id="editloc-<%= loc.id %>" style="display:none;">
+            <td colspan="7">
+              <form method="POST" action="/admin/locations/<%= loc.id %>/update" style="padding:16px; background:#f7f9f8;">
+                <div class="form-row">
+                  <div class="form-group"><label>City</label><input type="text" name="city" value="<%= loc.city %>" required></div>
+                  <div class="form-group"><label>Area</label><input type="text" name="area" value="<%= loc.area %>" required></div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Delivery Charge (₹)</label><input type="number" step="0.01" name="delivery_charge" value="<%= loc.delivery_charge %>" required></div>
+                  <div class="form-group"><label>Plantation Charge (₹)</label><input type="number" step="0.01" name="plantation_charge" value="<%= loc.plantation_charge %>" required></div>
+                </div>
+                <div class="form-group checkbox-row"><input type="checkbox" name="same_day_available" <%= loc.same_day_available ? 'checked' : '' %>> <label style="margin:0;">Same-day delivery</label></div>
+                <div class="form-group"><label>Notes</label><input type="text" name="notes" value="<%= loc.notes || '' %>"></div>
+                <div class="form-group checkbox-row"><input type="checkbox" name="is_active" <%= loc.is_active ? 'checked' : '' %>> <label style="margin:0;">Active</label></div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+              </form>
+              <form method="POST" action="/admin/locations/<%= loc.id %>/delete" onsubmit="return confirm('Delete this area?')" style="padding:0 16px 16px;">
+                <button type="submit" class="btn btn-danger btn-sm">Delete Area</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

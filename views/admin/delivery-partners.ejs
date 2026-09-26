@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %> | Green Nest Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <%- include('../partials/admin-sidebar') %>
+  <main class="admin-main">
+    <div class="admin-topbar"><h1>Delivery Partners</h1></div>
+    <p style="color:var(--text-muted); margin-top:-16px;">Manage your own delivery team, or connect third-party logistics partners like Porter, Dunzo or Shadowfax. Orders can be assigned to any active partner from the Orders page.</p>
+
+    <div class="admin-panel-box">
+      <h3>Add Delivery Partner</h3>
+      <form method="POST" action="/admin/delivery-partners">
+        <div class="form-row">
+          <div class="form-group"><label>Partner Name</label><input type="text" name="name" required placeholder="e.g. Porter, In-House Team, Local Rider"></div>
+          <div class="form-group">
+            <label>Partner Type</label>
+            <select name="partner_type" required>
+              <option value="in-house">In-House Delivery Team</option>
+              <option value="porter">Porter (Third-Party API)</option>
+              <option value="dunzo">Dunzo</option>
+              <option value="shadowfax">Shadowfax</option>
+              <option value="local-rider">Independent Local Rider</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Contact Number</label><input type="text" name="contact_number"></div>
+          <div class="form-group"><label>Email</label><input type="email" name="email"></div>
+        </div>
+        <div class="form-group"><label>API Key (for third-party partners like Porter, if applicable)</label><input type="text" name="api_key" placeholder="Paste API key from partner's dashboard"></div>
+        <div class="form-group"><label>Coverage Area</label><input type="text" name="coverage_area" placeholder="e.g. Lucknow, Kakori, Malihabad"></div>
+        <button type="submit" class="btn btn-primary">Add Partner</button>
+      </form>
+      <div class="alert alert-info" style="margin-top:16px;">
+        <strong>Note on Porter integration:</strong> Porter provides a Partner API for businesses to auto-book deliveries. Once you have Porter's business API credentials, paste the API key here — your developer can then wire the "Assign Order" action to call Porter's booking endpoint automatically. Until then, orders assigned to Porter can be booked manually via the Porter business app using the customer address shown in Orders.
+      </div>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Name</th><th>Type</th><th>Contact</th><th>Coverage</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% partners.forEach(p => { %>
+          <tr>
+            <td><%= p.name %></td>
+            <td><%= p.partner_type %></td>
+            <td><%= p.contact_number || '-' %></td>
+            <td><%= p.coverage_area || '-' %></td>
+            <td><%= p.status %></td>
+            <td><button class="btn btn-sm btn-outline" onclick="document.getElementById('editp-<%= p.id %>').style.display='block'">Edit</button></td>
+          </tr>
+          <tr id="editp-<%= p.id %>" style="display:none;">
+            <td colspan="6">
+              <form method="POST" action="/admin/delivery-partners/<%= p.id %>/update" style="padding:16px; background:#f7f9f8;">
+                <div class="form-row">
+                  <div class="form-group"><label>Name</label><input type="text" name="name" value="<%= p.name %>" required></div>
+                  <div class="form-group">
+                    <label>Type</label>
+                    <select name="partner_type">
+                      <% ['in-house','porter','dunzo','shadowfax','local-rider','other'].forEach(t => { %>
+                        <option value="<%= t %>" <%= p.partner_type === t ? 'selected' : '' %>><%= t %></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Contact</label><input type="text" name="contact_number" value="<%= p.contact_number || '' %>"></div>
+                  <div class="form-group"><label>Email</label><input type="email" name="email" value="<%= p.email || '' %>"></div>
+                </div>
+                <div class="form-group"><label>API Key</label><input type="text" name="api_key" value="<%= p.api_key || '' %>"></div>
+                <div class="form-group"><label>Coverage Area</label><input type="text" name="coverage_area" value="<%= p.coverage_area || '' %>"></div>
+                <div class="form-group">
+                  <label>Status</label>
+                  <select name="status">
+                    <option value="active" <%= p.status === 'active' ? 'selected' : '' %>>Active</option>
+                    <option value="inactive" <%= p.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+              </form>
+              <form method="POST" action="/admin/delivery-partners/<%= p.id %>/delete" onsubmit="return confirm('Remove this partner?')" style="padding:0 16px 16px;">
+                <button type="submit" class="btn btn-danger btn-sm">Remove Partner</button>
+              </form>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

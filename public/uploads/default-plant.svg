@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#eef6ee"/>
+  <circle cx="200" cy="150" r="70" fill="#c8e6c9"/>
+  <path d="M200 260 C 160 200, 160 120, 200 80 C 240 120, 240 200, 200 260 Z" fill="#4caf50"/>
+  <path d="M200 260 C 150 220, 120 190, 110 150 C 160 150, 190 180, 200 220 Z" fill="#66bb6a"/>
+  <path d="M200 260 C 250 220, 280 190, 290 150 C 240 150, 210 180, 200 220 Z" fill="#66bb6a"/>
+  <rect x="185" y="255" width="30" height="70" fill="#8d6e63"/>
+  <ellipse cx="200" cy="330" rx="90" ry="20" fill="#a1887f"/>
+  <text x="200" y="380" font-family="Arial, sans-serif" font-size="16" fill="#2e7d32" text-anchor="middle">Green Nest Plants</text>
+</svg>

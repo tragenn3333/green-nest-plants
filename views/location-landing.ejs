@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="hero">
+  <div class="container">
+    <h1>Plant Nursery &amp; Delivery in <%= location.area %>, <%= location.city %></h1>
+    <p class="subtitle">Order fresh, healthy plants online with doorstep delivery in <%= location.area %>. Professional plantation service also available for homes, offices and gardens in <%= location.area %>, <%= location.city %>.</p>
+    <a href="/plants" class="btn btn-primary">Shop Plants for <%= location.area %></a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="info-cards">
+      <div class="info-card"><div class="icon">🚚</div><h4>Delivery Charge</h4><p>₹<%= location.delivery_charge %> to <%= location.area %></p></div>
+      <div class="info-card"><div class="icon">🧑‍🌾</div><h4>Plantation Charge</h4><p>₹<%= location.plantation_charge %> professional plantation</p></div>
+      <div class="info-card"><div class="icon">⚡</div><h4>Same-Day Delivery</h4><p><%= location.same_day_available ? 'Available in ' + location.area : 'Not available currently — 24-48 hr delivery' %></p></div>
+    </div>
+    <% if (location.notes) { %><p style="margin-top:20px;"><strong>Note:</strong> <%= location.notes %></p><% } %>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-title">
+      <h2>Popular Plants for <%= location.area %> Homes &amp; Gardens</h2>
+    </div>
+    <div class="product-grid">
+      <% featured.forEach(p => { %>
+        <div class="product-card">
+          <a href="/plants/<%= p.id %>"><img src="<%= p.image %>" alt="<%= p.name %>"></a>
+          <div class="product-body">
+            <h3><a href="/plants/<%= p.id %>" style="color:inherit;"><%= p.name %></a></h3>
+            <div class="product-price">₹<%= p.price %></div>
+            <button class="btn btn-primary btn-sm" onclick="addToCart(<%= p.id %>, '<%= p.name.replace(/'/g, "\\'") %>', <%= p.price %>, '<%= p.image %>', 1)">Add to Cart</button>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width: 800px;">
+    <h2>Why Order Plants Online in <%= location.area %>?</h2>
+    <p>Finding a reliable plant nursery in <%= location.area %>, <%= location.city %> can be time-consuming. Green Nest Plants brings a wide variety of indoor, outdoor, flowering and fruit plants directly to your doorstep in <%= location.area %>, along with an optional professional plantation service so your new plant is set up correctly from day one. Whether you're decorating a home in <%= location.area %> or setting up a garden, we handle sourcing, delivery and planting.</p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+</body>
+</html>

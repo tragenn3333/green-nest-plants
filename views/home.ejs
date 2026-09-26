@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Bring Nature Home — Plants Delivered Across Lucknow, Kakori, Malihabad &amp; Maal</h1>
+      <p class="subtitle"><%= settings.tagline %>. Shop indoor, outdoor, flowering &amp; fruit plants online, with professional plantation and doorstep delivery service across Uttar Pradesh.</p>
+      <a href="/plants" class="btn btn-primary">Shop Plants Now</a>
+      <a href="/services" class="btn btn-outline" style="margin-left:10px;">Check Delivery Charges</a>
+      <div class="hero-badges">
+        <span class="hero-badge">🚚 Doorstep Delivery</span>
+        <span class="hero-badge">🌱 Plantation Service</span>
+        <span class="hero-badge">💳 Secure Online Payment</span>
+        <span class="hero-badge">📍 Lucknow, Kakori, Malihabad, Maal</span>
+      </div>
+    </div>
+    <div class="hero-visual">🌿🪴🌵</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Featured Plants</h2>
+      <p>Hand-picked healthy plants, ready to ship across Lucknow and nearby areas</p>
+    </div>
+    <div class="product-grid">
+      <% featured.forEach(p => { %>
+        <div class="product-card">
+          <a href="/plants/<%= p.id %>"><img src="<%= p.image %>" alt="<%= p.name %>"></a>
+          <div class="product-body">
+            <span class="product-category"><%= p.category %></span>
+            <h3><a href="/plants/<%= p.id %>" style="color:inherit;"><%= p.name %></a></h3>
+            <div class="product-price">₹<%= p.price %></div>
+            <div class="product-actions">
+              <button class="btn btn-primary btn-sm" onclick="addToCart(<%= p.id %>, '<%= p.name.replace(/'/g, "\\'") %>', <%= p.price %>, '<%= p.image %>', 1)">Add to Cart</button>
+              <a href="/plants/<%= p.id %>" class="btn btn-outline btn-sm">View</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-title">
+      <h2>Why Choose Green Nest Plants</h2>
+    </div>
+    <div class="info-cards">
+      <div class="info-card"><div class="icon">🌱</div><h4>Healthy, Nursery-Fresh Plants</h4><p>Every plant is quality-checked before dispatch.</p></div>
+      <div class="info-card"><div class="icon">🚚</div><h4>Reliable Local Delivery</h4><p>Fast delivery across Lucknow, Kakori, Malihabad &amp; Maal.</p></div>
+      <div class="info-card"><div class="icon">🧑‍🌾</div><h4>Professional Plantation Service</h4><p>Our team plants it for you, the right way, on-site.</p></div>
+      <div class="info-card"><div class="icon">💳</div><h4>Secure Payments</h4><p>Pay online safely, or choose cash on delivery.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="areas">
+  <div class="container">
+    <div class="section-title">
+      <h2>Areas We Serve</h2>
+      <p>Serving plant lovers across Lucknow and neighbouring towns in Uttar Pradesh</p>
+    </div>
+    <div class="info-cards">
+      <% locations.slice(0,8).forEach(loc => { %>
+        <div class="info-card">
+          <div class="icon">📍</div>
+          <h4><%= loc.area %>, <%= loc.city %></h4>
+          <p>Delivery: ₹<%= loc.delivery_charge %> &middot; Plantation: ₹<%= loc.plantation_charge %></p>
+          <a href="/locations/<%= loc.area.toLowerCase().replace(/\s+/g,'-') %>" class="btn btn-outline btn-sm">View Details</a>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+</body>
+</html>

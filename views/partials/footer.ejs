@@ -1,0 +1,37 @@
+<footer class="site-footer" id="contact">
+  <div class="container footer-grid">
+    <div>
+      <h3><%= settings.site_name || 'Green Nest Plants' %></h3>
+      <p><%= settings.tagline || "Lucknow's Trusted Online Plant Nursery" %></p>
+      <p>📍 <%= settings.address || 'Lucknow, Uttar Pradesh' %></p>
+      <p>📞 <a href="tel:<%= settings.phone %>"><%= settings.phone %></a></p>
+      <p>✉️ <a href="mailto:<%= settings.email %>"><%= settings.email %></a></p>
+    </div>
+    <div>
+      <h4>Quick Links</h4>
+      <a href="/plants">Shop All Plants</a>
+      <a href="/services">Delivery &amp; Plantation Charges</a>
+      <a href="/cart">My Cart</a>
+    </div>
+    <div>
+      <h4>Areas We Serve</h4>
+      <a href="/locations/gomti-nagar">Plants in Gomti Nagar, Lucknow</a>
+      <a href="/locations/hazratganj">Plants in Hazratganj, Lucknow</a>
+      <a href="/locations/kakori">Plants in Kakori, Lucknow</a>
+      <a href="/locations/malihabad">Plants in Malihabad, Lucknow</a>
+      <a href="/locations/maal">Plants in Maal, Lucknow</a>
+    </div>
+    <div>
+      <h4>Categories</h4>
+      <a href="/plants?category=Indoor%20Plants">Indoor Plants</a>
+      <a href="/plants?category=Outdoor%20Plants">Outdoor Plants</a>
+      <a href="/plants?category=Fruit%20Plants">Fruit Plants</a>
+      <a href="/plants?category=Flowering%20Plants">Flowering Plants</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; <%= new Date().getFullYear() %> <%= settings.site_name || 'Green Nest Plants' %>. Serving Lucknow, Kakori, Malihabad, Maal &amp; all of Uttar Pradesh.</p>
+    <a href="/admin/login" class="admin-link">Admin Login</a>
+  </div>
+</footer>
+<script src="/js/cart.js"></script>

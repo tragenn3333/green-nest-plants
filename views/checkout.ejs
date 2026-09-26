@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="section">
+  <div class="container">
+    <h1>Checkout</h1>
+    <div id="emptyCartMsg" style="display:none;"><p>Your cart is empty. <a href="/plants">Browse plants →</a></p></div>
+
+    <div class="checkout-grid" id="checkoutForm">
+      <form class="form-card" id="orderForm">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="customerName" required>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number">
+        </div>
+        <div class="form-group">
+          <label>Delivery Address</label>
+          <textarea name="address" rows="3" required placeholder="House no, street, landmark"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Delivery Location</label>
+          <select name="locationId" id="locationSelect" required>
+            <option value="">Select your area</option>
+            <% locations.forEach(loc => { %>
+              <option value="<%= loc.id %>" data-delivery="<%= loc.delivery_charge %>" data-plantation="<%= loc.plantation_charge %>">
+                <%= loc.area %>, <%= loc.city %>
+              </option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group checkbox-row">
+          <input type="checkbox" id="wantsPlantation" name="wantsPlantation">
+          <label for="wantsPlantation" style="margin:0;">I want professional plantation service at my location</label>
+        </div>
+        <div class="form-group">
+          <label>Payment Method</label>
+          <select name="paymentMethod" id="paymentMethod">
+            <% if (razorpayKeyId) { %><option value="online">Pay Online (Card / UPI / Netbanking)</option><% } %>
+            <option value="cod">Cash on Delivery</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+        <div id="orderError" class="alert alert-error" style="display:none; margin-top:14px;"></div>
+      </form>
+
+      <div class="cart-summary" id="orderSummary" style="margin-left:0;">
+        <h3>Order Summary</h3>
+        <div id="summaryItems"></div>
+        <div class="cart-summary-row"><span>Items Total</span><span id="sumItems">₹0</span></div>
+        <div class="cart-summary-row"><span>Delivery Charge</span><span id="sumDelivery">₹0</span></div>
+        <div class="cart-summary-row"><span>Plantation Charge</span><span id="sumPlantation">₹0</span></div>
+        <div class="cart-summary-row total"><span>Grand Total</span><span id="sumTotal">₹0</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<script>
+const RAZORPAY_KEY_ID = "<%= razorpayKeyId %>";
+
+function refreshSummary() {
+  const cart = getCart();
+  const itemsTotal = cartTotal();
+  const select = document.getElementById('locationSelect');
+  const opt = select.options[select.selectedIndex];
+  const delivery = opt && opt.value ? parseFloat(opt.dataset.delivery) : 0;
+  const wantsPlantation = document.getElementById('wantsPlantation').checked;
+  const plantation = (wantsPlantation && opt && opt.value) ? parseFloat(opt.dataset.plantation) : 0;
+
+  document.getElementById('summaryItems').innerHTML = cart.map(i => `<div class="cart-summary-row"><span>${i.name} × ${i.qty}</span><span>₹${(i.price*i.qty).toFixed(2)}</span></div>`).join('');
+  document.getElementById('sumItems').textContent = '₹' + itemsTotal.toFixed(2);
+  document.getElementById('sumDelivery').textContent = '₹' + delivery.toFixed(2);
+  document.getElementById('sumPlantation').textContent = '₹' + plantation.toFixed(2);
+  document.getElementById('sumTotal').textContent = '₹' + (itemsTotal + delivery + plantation).toFixed(2);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const cart = getCart();
+  if (cart.length === 0) {
+    document.getElementById('emptyCartMsg').style.display = 'block';
+    document.getElementById('checkoutForm').style.display = 'none';
+    return;
+  }
+  refreshSummary();
+  document.getElementById('locationSelect').addEventListener('change', refreshSummary);
+  document.getElementById('wantsPlantation').addEventListener('change', refreshSummary);
+
+  document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const errBox = document.getElementById('orderError');
+    errBox.style.display = 'none';
+    const form = e.target;
+    const cart = getCart();
+    const items = cart.map(i => ({ productId: i.productId, qty: i.qty }));
+
+    const payload = {
+      customerName: form.customerName.value,
+      phone: form.phone.value,
+      address: form.address.value,
+      locationId: form.locationId.value,
+      wantsPlantation: document.getElementById('wantsPlantation').checked,
+      items
+    };
+
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Order failed');
+
+      if (data.codMode || form.paymentMethod.value === 'cod' || !RAZORPAY_KEY_ID) {
+        clearCart();
+        window.location.href = '/order-success/' + data.orderId;
+        return;
+      }
+
+      // Razorpay online payment flow
+      const rzp = new Razorpay({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Green Nest Plants',
+        description: 'Plant order payment',
+        order_id: data.razorpayOrderId,
+        handler: async function (response) {
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: data.orderId,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            })
+          });
+          if (verifyRes.ok) {
+            clearCart();
+            window.location.href = '/order-success/' + data.orderId;
+          } else {
+            errBox.textContent = 'Payment could not be verified. Please contact support with your order ID: ' + data.orderId;
+            errBox.style.display = 'block';
+          }
+        },
+        prefill: { name: payload.customerName, contact: payload.phone },
+        theme: { color: '#2d6a4f' }
+      });
+      rzp.open();
+
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+    }
+  });
+});
+</script>
+</body>
+</html>

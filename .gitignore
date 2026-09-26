@@ -1,0 +1,9 @@
+node_modules/
+.env
+db/*.db
+db/*.db-shm
+db/*.db-wal
+public/uploads/*
+!public/uploads/default-plant.svg
+.DS_Store
+npm-debug.log*

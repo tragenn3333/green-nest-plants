@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %> | Green Nest Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <%- include('../partials/admin-sidebar') %>
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1>Dashboard</h1>
+      <span>Welcome, <%= username %></span>
+    </div>
+
+    <div class="admin-stats">
+      <div class="stat-card"><div class="stat-value"><%= productCount %></div><div class="stat-label">Total Products</div></div>
+      <div class="stat-card"><div class="stat-value"><%= orderCount %></div><div class="stat-label">Total Orders</div></div>
+      <div class="stat-card"><div class="stat-value"><%= pendingOrders %></div><div class="stat-label">Orders In Progress</div></div>
+      <div class="stat-card"><div class="stat-value">₹<%= revenue.toFixed(2) %></div><div class="stat-label">Total Revenue</div></div>
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          <% recentOrders.forEach(o => { %>
+          <tr>
+            <td>#<%= o.id %></td>
+            <td><%= o.customer_name %></td>
+            <td>₹<%= o.grand_total %></td>
+            <td><%= o.payment_status %></td>
+            <td><span class="status-tag status-<%= o.order_status %>"><%= o.order_status %></span></td>
+            <td><%= new Date(o.created_at).toLocaleDateString() %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:16px;"><a href="/admin/orders">View all orders →</a></p>
+  </main>
+</div>
+</body>
+</html>

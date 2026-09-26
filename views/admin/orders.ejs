@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= pageTitle %> | Green Nest Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <%- include('../partials/admin-sidebar') %>
+  <main class="admin-main">
+    <div class="admin-topbar"><h1>Orders</h1></div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr><th>Order</th><th>Customer</th><th>Location</th><th>Total</th><th>Payment</th><th>Assigned Partner</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% orders.forEach(o => { %>
+          <% const loc = locationMap[o.location_id]; %>
+          <tr>
+            <td>#<%= o.id %></td>
+            <td><%= o.customer_name %><br><small><%= o.phone %></small></td>
+            <td><%= loc ? loc.area + ', ' + loc.city : '-' %></td>
+            <td>₹<%= o.grand_total %></td>
+            <td><%= o.payment_status %></td>
+            <td>
+              <form method="POST" action="/admin/orders/<%= o.id %>/assign" style="display:flex; gap:6px;">
+                <select name="partner_id" style="padding:6px;">
+                  <option value="">Unassigned</option>
+                  <% partners.forEach(p => { %>
+                    <option value="<%= p.id %>" <%= o.assigned_partner_id === p.id ? 'selected' : '' %>><%= p.name %></option>
+                  <% }) %>
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline">Assign</button>
+              </form>
+            </td>
+            <td>
+              <form method="POST" action="/admin/orders/<%= o.id %>/status" style="display:flex; gap:6px;">
+                <select name="order_status" style="padding:6px;">
+                  <% ['placed','confirmed','out_for_delivery','delivered','cancelled'].forEach(s => { %>
+                    <option value="<%= s %>" <%= o.order_status === s ? 'selected' : '' %>><%= s %></option>
+                  <% }) %>
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline">Update</button>
+              </form>
+            </td>
+            <td><button class="btn btn-sm btn-outline" onclick="document.getElementById('view-<%= o.id %>').style.display='block'">View</button></td>
+          </tr>
+          <tr id="view-<%= o.id %>" style="display:none;">
+            <td colspan="8" style="background:#f7f9f8; padding:16px;">
+              <strong>Address:</strong> <%= o.address %><br>
+              <strong>Items:</strong>
+              <ul>
+                <% JSON.parse(o.items_json).forEach(it => { %>
+                  <li><%= it.name %> × <%= it.qty %> — ₹<%= it.price * it.qty %></li>
+                <% }) %>
+              </ul>
+              <strong>Plantation Requested:</strong> <%= o.wants_plantation ? 'Yes' : 'No' %><br>
+              <strong>Order Date:</strong> <%= new Date(o.created_at).toLocaleString() %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+</body>
+</html>

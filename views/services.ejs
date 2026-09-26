@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/navbar') %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h1>Plant Delivery &amp; Plantation Service</h1>
+      <p>Transparent charges for every area we serve across Lucknow, Kakori, Malihabad, Maal &amp; Uttar Pradesh</p>
+    </div>
+
+    <div class="info-cards" style="margin-bottom:40px;">
+      <div class="info-card"><div class="icon">🚚</div><h4>Home Delivery</h4><p>We deliver healthy, well-packed plants directly to your doorstep.</p></div>
+      <div class="info-card"><div class="icon">🧑‍🌾</div><h4>Plantation Service</h4><p>Our trained gardeners plant it correctly at your home or garden.</p></div>
+      <div class="info-card"><div class="icon">⚡</div><h4>Same-Day Delivery</h4><p>Available in select areas of Lucknow — check the table below.</p></div>
+    </div>
+
+    <table class="charges-table">
+      <thead>
+        <tr>
+          <th>City</th>
+          <th>Area</th>
+          <th>Delivery Charge</th>
+          <th>Plantation Service Charge</th>
+          <th>Same-Day Delivery</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% locations.forEach(loc => { %>
+        <tr>
+          <td><%= loc.city %></td>
+          <td><%= loc.area %></td>
+          <td>₹<%= loc.delivery_charge %></td>
+          <td>₹<%= loc.plantation_charge %></td>
+          <td><%= loc.same_day_available ? '<span class="badge-yes">Available</span>' : '<span class="badge-no">Not available</span>' %></td>
+          <td><%= loc.notes || '-' %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <p style="margin-top:24px; color:var(--text-muted);">Charges shown above are updated directly by our team and may change during festival seasons. Final charges are always confirmed at checkout based on your delivery address.</p>
+
+    <div style="text-align:center; margin-top:30px;">
+      <a href="/plants" class="btn btn-primary">Shop Plants Now</a>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+</body>
+</html>
